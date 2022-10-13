@@ -1,1 +1,1 @@
-# TeamProject of Navigation App with jira rezo
+# TeamProject of Navigation App
