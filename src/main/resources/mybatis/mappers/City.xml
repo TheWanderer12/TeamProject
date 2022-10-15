@@ -6,7 +6,7 @@
     <resultMap id="CityResultMap" type="City">
         <result property="id" column="id"/>
         <result property="city" column="city"/>
-        <result property="cityAscii" column="city_ascii"/>
+        <result property="city_ascii" column="city_ascii"/>
         <result property="lat" column="lat"/>
         <result property="lng" column="lng"/>
         <result property="country" column="country"/>

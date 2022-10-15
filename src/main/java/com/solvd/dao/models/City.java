@@ -3,19 +3,27 @@ package com.solvd.dao.models;
 public class City {
     private int id;
     private String city;
-    private String cityAscii;
-    private String lat;
-    private String lng;
+    private String city_ascii;
+    private double lat;
+    private double lng;
     private String country;
 
     public City(){
 
     }
 
-    public City(int id, String city, String cityAscii, String lat, String lng, String country) {
+    public String getCity_ascii() {
+        return city_ascii;
+    }
+
+    public void setCity_ascii(String city_ascii) {
+        this.city_ascii = city_ascii;
+    }
+
+    public City(int id, String city, String city_ascii, double lat, double lng, String country) {
         this.id = id;
         this.city = city;
-        this.cityAscii = cityAscii;
+        this.city_ascii = city_ascii;
         this.lat = lat;
         this.lng = lng;
         this.country = country;
@@ -37,27 +45,21 @@ public class City {
         this.city = city;
     }
 
-    public String getCityAscii() {
-        return cityAscii;
-    }
 
-    public void setCityAscii(String cityAscii) {
-        this.cityAscii = cityAscii;
-    }
 
-    public String getLat() {
+    public double getLat() {
         return lat;
     }
 
-    public void setLat(String lat) {
+    public void setLat(double lat) {
         this.lat = lat;
     }
 
-    public String getLng() {
+    public double getLng() {
         return lng;
     }
 
-    public void setLng(String lng) {
+    public void setLng(double lng) {
         this.lng = lng;
     }
 

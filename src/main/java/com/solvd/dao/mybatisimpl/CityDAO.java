@@ -7,6 +7,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+
 public class CityDAO implements ICityDAO {
     private static final Logger logger = LogManager.getLogger(CityDAO.class);
 
@@ -64,4 +66,13 @@ public class CityDAO implements ICityDAO {
     }
 
 
+//    @Override
+//    public List<City> getProbableRouteCities(String city) {
+//        return null;
+//    }
+
+    @Override
+    public City getCityByName(String name) {
+        return null;
+    }
 }

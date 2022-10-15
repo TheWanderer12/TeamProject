@@ -4,10 +4,10 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 
-    <properties resource="mysql.properties"/>
+    <properties resource="properties/mysql.properties"/>
 
     <typeAliases>
-        <typeAlias alias="Company" type="com.solvd.dao.models.City"/>
+        <typeAlias alias="City" type="com.solvd.dao.models.City"/>
     </typeAliases>
 
 
