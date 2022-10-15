@@ -7,4 +7,5 @@ import java.util.List;
 public interface ICityDAO extends IBaseDAO<City>{
 //    List<City> getProbableRouteCities(String city);
     City getCityByName(String name);
+    List<City> getCitiesInRange(City from, City to);
 }

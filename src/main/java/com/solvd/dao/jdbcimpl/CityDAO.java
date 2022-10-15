@@ -20,7 +20,7 @@ public class CityDAO implements ICityDAO {
     public City getById(int id) {
         try {
             Connection conn = ConnectionPool.getInstance().retrieve();
-            PreparedStatement statement = conn.prepareStatement("SELECT id, city, city_ascii, lat, lng, country FROM cities WHERE id = ?");
+            PreparedStatement statement = conn.prepareStatement("SELECT id, city, lat, lng, country FROM cities WHERE id = ?");
             statement.setInt(1, id);
             ResultSet result = statement.executeQuery();
             String output = "";
@@ -35,7 +35,6 @@ public class CityDAO implements ICityDAO {
 
                 city.setId(result.getInt("id"));
                 city.setCity(result.getString("city"));
-                city.setCity_ascii(result.getString("city_ascii"));
                 city.setLat(result.getDouble("lat"));
                 city.setLng(result.getDouble("lng"));
                 city.setCountry(result.getString("country"));
@@ -52,12 +51,11 @@ public class CityDAO implements ICityDAO {
     public void insert(City city) {
         try {
             Connection conn = ConnectionPool.getInstance().retrieve();
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO cities(city, city_ascii, lat, lng, country) VALUES (?,?,?,?,?)");
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO cities(city, lat, lng, country) VALUES (?,?,?,?)");
             statement.setString(1, city.getCity());
-            statement.setString(2, city.getCity_ascii());
-            statement.setDouble(3, city.getLat());
-            statement.setDouble(4, city.getLng());
-            statement.setString(5, city.getCountry());
+            statement.setDouble(2, city.getLat());
+            statement.setDouble(3, city.getLng());
+            statement.setString(4, city.getCountry());
             statement.executeUpdate();
         } catch (SQLException e) {
             logger.error(e);
@@ -81,18 +79,18 @@ public class CityDAO implements ICityDAO {
     public void update(City com) {
         try {
             Connection conn = ConnectionPool.getInstance().retrieve();
-            PreparedStatement statement = conn.prepareStatement("UPDATE cities SET city = ?, city_ascii = ?, lat = ?, lng = ?, country = ?  WHERE id = ?");
+            PreparedStatement statement = conn.prepareStatement("UPDATE cities SET city = ?, lat = ?, lng = ?, country = ?  WHERE id = ?");
             statement.setString(1, com.getCity());
-            statement.setString(2, com.getCity_ascii());
-            statement.setDouble(3, com.getLat());
-            statement.setDouble(4, com.getLng());
-            statement.setString(5, com.getCountry());
-            statement.setInt(6, com.getId());
+            statement.setDouble(2, com.getLat());
+            statement.setDouble(3, com.getLng());
+            statement.setString(4, com.getCountry());
+            statement.setInt(5, com.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             logger.error(e);
         }
     }
+
 
 
     @Override
@@ -113,6 +111,51 @@ public class CityDAO implements ICityDAO {
             }
             System.out.println(output);
             return city;
+        } catch (SQLException e) {
+            logger.error(e);
+        }
+        return null;
+    }
+
+    @Override
+    public List<City> getCitiesInRange(City from, City to) {
+        try {
+            Connection conn = ConnectionPool.getInstance().retrieve();
+            PreparedStatement statement = conn.prepareStatement("SELECT city, lat, lng FROM cities WHERE (lat BETWEEN ? AND ?) AND (lng BETWEEN ? AND ?)");
+            if(from.getLat() <= to.getLat()){
+                statement.setDouble(1, from.getLat());
+                statement.setDouble(2, to.getLat());
+            }else{
+                statement.setDouble(2, from.getLat());
+                statement.setDouble(1, to.getLat());
+            }
+            if(from.getLng() <= to.getLng()){
+                statement.setDouble(3, from.getLng());
+                statement.setDouble(4, to.getLng());
+            }else{
+                statement.setDouble(4, from.getLng());
+                statement.setDouble(3, to.getLng());
+            }
+
+            ResultSet result = statement.executeQuery();
+
+            String output = "";
+
+
+            List<City> cities = new ArrayList<>();
+
+            while (result.next()) {
+                City city = new City();
+                city.setCity(result.getString("city"));
+                city.setLat(result.getDouble("lat"));
+                city.setLng(result.getDouble("lng"));
+//                output += "\nCity: " + result.getString("city")
+//                        +"\nlat: " + result.getString("lat")
+//                        + "\nlng: "+ result.getString("lng");
+                cities.add(city);
+            }
+            System.out.println(output);
+            return cities;
         } catch (SQLException e) {
             logger.error(e);
         }

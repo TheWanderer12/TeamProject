@@ -3,13 +3,16 @@ package com.solvd.dao.service;
 import com.solvd.dao.models.City;
 import com.solvd.dao.jdbcimpl.CityDAO;
 
+import java.util.List;
+
 public class DistanceCalculator {
     final static int earthRadiusKm = 6371;
     final static int earthRadiusMile = 3963;
-    static double getDistances(String origin, String destination){
+    static double getDistance(String origin, String destination){
         CityDAO dao = new CityDAO();
         City from = dao.getCityByName(origin);
         City to = dao.getCityByName(destination);
+
 
         from.setLat(Math.toRadians(from.getLat()));
         from.setLng(Math.toRadians(from.getLng()));
@@ -22,19 +25,39 @@ public class DistanceCalculator {
                 + Math.cos(from.getLat())
                 * Math.cos(to.getLat())
                 * Math.cos(to.getLng() - from.getLng()));
+        System.out.println( "distance between " + origin + " and "+ destination + ": " + result + " Km");
 
 
-
-        System.out.println( "distance between " + origin + " and "+ destination + ": " + result);
         return result;
     }
 
-    public static void main(String[] args) {
-//        City city = dao.getById(1);
-//        String originLat = city.getLat();
-//        String originLng = city.getLng();
-//        System.out.println(originLng);
+    public static double[][] getDistanceMatrix(City from, City to){
+        //values of chosen origin and destination
+//        double originLat = from.getLat();
+//        double originLng = from.getLng();
+//        double destinationLat = to.getLat();
+//        double destinationLng = to.getLng();
+//        double fromFromToTo = getDistance(from.getCity(),to.getCity());
 
-        getDistances("Moscow","delhi");
+        //list of probable route cities
+        List<City> cities = new CityDAO().getCitiesInRange(from, to);
+        double[][] myMatrix = new double[cities.size()][cities.size()];
+
+        for(int i = 0; i < cities.size(); i++){
+            for (int j = 0; j < cities.size(); j++) {
+                myMatrix[i][j] = getDistance(cities.get(i).getCity(),cities.get(j).getCity());
+            }
+        }
+        return myMatrix;
+    };
+
+    public static void main(String[] args) {
+//        getDistance("Moscow","delhi");
+        CityDAO dao = new CityDAO();
+        City from = dao.getCityByName("Shanghai");
+        City to = dao.getCityByName("Guangzhou");
+
+        FloydsAlgorithm.floydWarshall(getDistanceMatrix(from,to));
+        //        getDistance("Shanghai","Guangzhou");
     }
 }

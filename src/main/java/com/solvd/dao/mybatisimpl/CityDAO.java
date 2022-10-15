@@ -75,4 +75,9 @@ public class CityDAO implements ICityDAO {
     public City getCityByName(String name) {
         return null;
     }
+
+    @Override
+    public List<City> getCitiesInRange(City from, City to) {
+        return null;
+    }
 }

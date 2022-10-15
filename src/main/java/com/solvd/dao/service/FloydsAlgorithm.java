@@ -4,34 +4,36 @@ import com.solvd.dao.models.City;
 import com.solvd.dao.mybatisimpl.CityDAO;
 
 public class FloydsAlgorithm {
-    final static int INF = 9999, nV = 4;
+
 
     // Implementing floyd warshall algorithm
-    static void floydWarshall(int graph[][]) {
-        int matrix[][] = new int[nV][nV];
+    public static double[][] floydWarshall(double graph[][]) {
+        int length = graph.length;
+        double matrix[][] = new double[length][length];
         int i, j, k;
 
-        for (i = 0; i < nV; i++)
-            for (j = 0; j < nV; j++)
+        for (i = 0; i < length; i++)
+            for (j = 0; j < length; j++)
                 matrix[i][j] = graph[i][j];
 
         // Adding vertices individually
-        for (k = 0; k < nV; k++) {
-            for (i = 0; i < nV; i++) {
-                for (j = 0; j < nV; j++) {
+        for (k = 0; k < length; k++) {
+            for (i = 0; i < length; i++) {
+                for (j = 0; j < length; j++) {
                     if (matrix[i][k] + matrix[k][j] < matrix[i][j])
                         matrix[i][j] = matrix[i][k] + matrix[k][j];
                 }
             }
         }
         printMatrix(matrix);
+        return matrix;
     }
 
-    static void printMatrix(int matrix[][]) {
-        for (int i = 0; i < nV; ++i) {
-            for (int j = 0; j < nV; ++j) {
-                if (matrix[i][j] == INF)
-                    System.out.print("INF ");
+    public static void printMatrix(double matrix[][]) {
+        for (int i = 0; i < matrix.length; ++i) {
+            for (int j = 0; j < matrix.length; ++j) {
+                if (matrix[i][j] < 0)
+                    System.out.print("-1 ");
                 else
                     System.out.print(matrix[i][j] + "  ");
             }
@@ -39,13 +41,5 @@ public class FloydsAlgorithm {
         }
     }
 
-    public static void main(String[] args) {
 
-        int graph[][] = {
-                {  0,    3, INF,   5},
-                {  2,    0, INF,   4},
-                { INF,   1,   0, INF},
-                { INF, INF,   2,   0} };
-        floydWarshall(graph);
-    }
 }
