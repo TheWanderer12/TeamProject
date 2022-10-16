@@ -97,17 +97,18 @@ public class CityDAO implements ICityDAO {
     public City getCityByName(String c) {
         try {
             Connection conn = ConnectionPool.getInstance().retrieve();
-            PreparedStatement statement = conn.prepareStatement("SELECT lat, lng FROM cities WHERE city = ?");
+            PreparedStatement statement = conn.prepareStatement("SELECT city, lat, lng FROM cities WHERE city = ?");
             statement.setString(1, c);
             ResultSet result = statement.executeQuery();
             String output = "";
             City city = new City();
             while (result.next()) {
+                city.setCity(result.getString("city"));
                 city.setLat(result.getDouble("lat"));
                 city.setLng(result.getDouble("lng"));
 
-                output += "lat: " + result.getString("lat")
-                        + "\nlng: "+ result.getString("lng");
+//                output += "lat: " + result.getString("lat")
+//                        + "\nlng: "+ result.getString("lng");
             }
             System.out.println(output);
             return city;
@@ -154,7 +155,7 @@ public class CityDAO implements ICityDAO {
 //                        + "\nlng: "+ result.getString("lng");
                 cities.add(city);
             }
-            System.out.println(output);
+//            System.out.println(output);
             return cities;
         } catch (SQLException e) {
             logger.error(e);
