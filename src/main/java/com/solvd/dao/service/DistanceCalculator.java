@@ -5,11 +5,14 @@ import com.solvd.dao.jdbcimpl.CityDAO;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class DistanceCalculator {
+    final static int INFINITE = 99999;
     final static int earthRadiusKm = 6371;
     final static int earthRadiusMile = 3963;
+
 
     static double getDistance(String origin, String destination){
         CityDAO dao = new CityDAO();
@@ -42,24 +45,36 @@ public class DistanceCalculator {
             for (int j = 0; j < cities.size(); j++) {
                 myMatrix[i][j] = getDistance(cities.get(i).getCity(),cities.get(j).getCity());
                 if(myMatrix[i][j] == getDistance(from.getCity(), to.getCity())){
-                    myMatrix[i][j] = 0;
+                    myMatrix[i][j] = INFINITE;
                 }
+
             }
         }
         return myMatrix;
     }
 
     public static void main(String[] args) {
-//        getDistance("Moscow","delhi");
+        Scanner scanner = new Scanner(System.in);
         CityDAO dao = new CityDAO();
         City from = dao.getCityByName("Tokyo");
         City to = dao.getCityByName("Shanghai");
-        FloydsAlgorithm.floydWarshall(getDistanceMatrix(from,to));
+        FloydsAlgorithm floyd = new FloydsAlgorithm();
 
-        System.out.println( "\nTokyo lng: " + from.getLng() + " lat: " + from.getLat()
-                +"\nSeoul lng: " + to.getLng() + " lat: " + to.getLat());
+
+        double[][] graph = getDistanceMatrix(from,to);
+        floyd.initializePath(graph);
+        floyd.floydWarshall(graph);
+
+        System.out.println("Starting point: ");
+        int origin = scanner.nextInt();
+        System.out.println("Ending point: ");
+        int destination = scanner.nextInt();
+
+        floyd.printPath(origin,destination,graph);
 
         getDistance("Tokyo","Shanghai");
 
+//        System.out.println( "\nTokyo lng: " + from.getLng() + " lat: " + from.getLat()
+//                +"\nshanghai lng: " + to.getLng() + " lat: " + to.getLat());
     }
 }
