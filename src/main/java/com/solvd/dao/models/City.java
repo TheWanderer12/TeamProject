@@ -2,7 +2,7 @@ package com.solvd.dao.models;
 
 public class City {
     private int id;
-    private String city;
+    private String name;
 
     private double lat;
     private double lng;
@@ -15,9 +15,9 @@ public class City {
 
 
 
-    public City(int id, String city, double lat, double lng, String country) {
+    public City(int id, String name, double lat, double lng, String country) {
         this.id = id;
-        this.city = city;
+        this.name = name;
         this.lat = lat;
         this.lng = lng;
         this.country = country;
@@ -31,12 +31,12 @@ public class City {
         this.id = id;
     }
 
-    public String getCity() {
-        return city;
+    public String getName() {
+        return name;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setName(String name) {
+        this.name = name;
     }
 
 
@@ -64,4 +64,5 @@ public class City {
     public void setCountry(String country) {
         this.country = country;
     }
+
 }

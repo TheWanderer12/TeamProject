@@ -3,22 +3,25 @@ package com.solvd.dao.service;
 import com.solvd.dao.models.City;
 import com.solvd.dao.jdbcimpl.CityDAO;
 
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
 
 public class DistanceCalculator {
-    final static int INFINITE = 99999;
+    public static final CityDAO dao = new CityDAO();
+
     final static int earthRadiusKm = 6371;
     final static int earthRadiusMile = 3963;
-
+    final static NumberFormat nf = new DecimalFormat("#0.00");
 
     static double getDistance(String origin, String destination){
-        CityDAO dao = new CityDAO();
         City from = dao.getCityByName(origin);
         City to = dao.getCityByName(destination);
-
 
         from.setLat(Math.toRadians(from.getLat()));
         from.setLng(Math.toRadians(from.getLng()));
@@ -31,49 +34,58 @@ public class DistanceCalculator {
                 + Math.cos(from.getLat())
                 * Math.cos(to.getLat())
                 * Math.cos(to.getLng() - from.getLng()));
-        System.out.println( "distance between " + origin + " and "+ destination + ": " + result + " Km");
 
+//        System.out.println( "distance between " + origin + " and "+ destination + ": " + result + " Km");
         return result;
     }
 
-    public static double[][] getDistanceMatrix(City from, City to){
-        //list of probable route cities
-        List<City> cities = new CityDAO().getCitiesInRange(from, to);
-        double[][] myMatrix = new double[cities.size()][cities.size()];
-
-        for(int i = 0; i < cities.size(); i++){
-            for (int j = 0; j < cities.size(); j++) {
-                myMatrix[i][j] = getDistance(cities.get(i).getCity(),cities.get(j).getCity());
-                if(myMatrix[i][j] == getDistance(from.getCity(), to.getCity())){
-                    myMatrix[i][j] = INFINITE;
-                }
-
+    public static City getClosestCityToDiagonal(City from, City to){
+        List<City> cities = dao.getCitiesInRange(from, to);
+        City result = cities.get(0);
+        for (int i = 1; i < cities.size(); i++) {
+            if (getDistance(from.getName(), cities.get(i).getName()) + getDistance(cities.get(i).getName(), to.getName())
+                    < getDistance(from.getName(), result.getName()) + getDistance(result.getName(), to.getName())){
+                result = cities.get(i);
             }
         }
-        return myMatrix;
+        return result;
+    }
+    public static List<City> getPathCities(City from, City to) {
+        List<City> pathCities = new ArrayList<>();
+        pathCities.add(from);
+        while(dao.getCitiesInRange(from, to).size() > 0) {
+            from = getClosestCityToDiagonal(from, to);
+            pathCities.add(from);
+        }
+        pathCities.add(to);
+        return pathCities;
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        CityDAO dao = new CityDAO();
-        City from = dao.getCityByName("Tokyo");
-        City to = dao.getCityByName("Shanghai");
-        FloydsAlgorithm floyd = new FloydsAlgorithm();
+        City from = dao.getCityByName("Moscow");
+        City to = dao.getCityByName("Delhi");
+//        List<City> cities = dao.getCitiesInRange(from, to);
+//        for (City c:cities) {
+//            System.out.println(c.getName());
+//        }
+        System.out.println("Calculating Path From "+from.getName()+" to "+to.getName() + ". it might take few mins...");
+        List<City> pathCities = getPathCities(from, to);
+        for (City c: pathCities) {
+            if (c.equals(to)) {
+                System.out.println(c.getName());
+            } else {
+                System.out.print(c.getName() + " -> ");
+            }
+        }
+        double sum = 0;
+        for (int i = 1; i < pathCities.size(); i++) {
+            sum+= getDistance(pathCities.get(i).getName(),pathCities.get(i-1).getName());
+        }
+        System.out.println("Path Length = " + nf.format(sum) + " Km");
 
-
-        double[][] graph = getDistanceMatrix(from,to);
-        floyd.initializePath(graph);
-        floyd.floydWarshall(graph);
-
-        System.out.println("Starting point: ");
-        int origin = scanner.nextInt();
-        System.out.println("Ending point: ");
-        int destination = scanner.nextInt();
-
-        floyd.printPath(origin,destination,graph);
-
-        getDistance("Tokyo","Shanghai");
-
+//
+//
 //        System.out.println( "\nTokyo lng: " + from.getLng() + " lat: " + from.getLat()
 //                +"\nshanghai lng: " + to.getLng() + " lat: " + to.getLat());
     }
