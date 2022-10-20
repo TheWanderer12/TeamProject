@@ -28,7 +28,7 @@ public class DistanceCalculator {
         to.setLat(Math.toRadians(to.getLat()));
         to.setLng(Math.toRadians(to.getLng()));
 
-
+        //formula to calculate distance between two Locations on Sphere
         double result = earthRadiusKm * Math.acos((Math.sin(from.getLat())
                 * Math.sin(to.getLat()))
                 + Math.cos(from.getLat())
@@ -39,10 +39,19 @@ public class DistanceCalculator {
         return result;
     }
 
+
+    //checks which city is the closest to the straight line between origin and destination
     public static City getClosestCityToDiagonal(City from, City to){
+        //from -> chosen origin location
+        //to -> chosen destination location
         List<City> cities = dao.getCitiesInRange(from, to);
+
+        //setting initial Closest city value
         City result = cities.get(0);
+
+        //checks distances between chosen city(from) and all cities in range
         for (int i = 1; i < cities.size(); i++) {
+            //checks if city is closer than initial closest city
             if (getDistance(from.getName(), cities.get(i).getName()) + getDistance(cities.get(i).getName(), to.getName())
                     < getDistance(from.getName(), result.getName()) + getDistance(result.getName(), to.getName())){
                 result = cities.get(i);
@@ -50,6 +59,8 @@ public class DistanceCalculator {
         }
         return result;
     }
+
+    //main function: creates path of cities in form of a list
     public static List<City> getPathCities(City from, City to) {
         List<City> pathCities = new ArrayList<>();
         pathCities.add(from);
@@ -57,21 +68,22 @@ public class DistanceCalculator {
             from = getClosestCityToDiagonal(from, to);
             pathCities.add(from);
         }
+        //if size is 0 its end of path and destination is added to path of cities
         pathCities.add(to);
         return pathCities;
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        //User input
         System.out.println("Enter origin: ");
         City from = dao.getCityByName(scanner.nextLine());
         System.out.println("Enter Destination: ");
         City to = dao.getCityByName(scanner.nextLine());
-//        List<City> cities = dao.getCitiesInRange(from, to);
-//        for (City c:cities) {
-//            System.out.println(c.getName());
-//        }
+
+
         System.out.println("Calculating Path From "+from.getName()+" to "+to.getName() + ". it might take few mins...");
+
         List<City> pathCities = getPathCities(from, to);
         for (City c: pathCities) {
             if (c.equals(to)) {
@@ -80,11 +92,11 @@ public class DistanceCalculator {
                 System.out.print(c.getName() + " -> ");
             }
         }
-        double sum = 0;
+        double distance = 0;
         for (int i = 1; i < pathCities.size(); i++) {
-            sum+= getDistance(pathCities.get(i).getName(),pathCities.get(i-1).getName());
+            distance+= getDistance(pathCities.get(i).getName(),pathCities.get(i-1).getName());
         }
-        System.out.println("Path Length = " + nf.format(sum) + " Km");
+        System.out.println("Path Length = " + nf.format(distance) + " Km");
 
 //
 //
