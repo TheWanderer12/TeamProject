@@ -14,7 +14,7 @@ import java.util.Vector;
 
 public class ConnectionPool {
     private static final Logger LOGGER = LogManager.getLogger(ConnectionPool.class);
-    private static final int CON_POOL_SIZE = 5;
+    private static final int CON_POOL_SIZE = 10;
     private static Properties p = new Properties();
     private static ConnectionPool instance = null;
     private static String userName;

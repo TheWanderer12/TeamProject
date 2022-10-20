@@ -63,8 +63,10 @@ public class DistanceCalculator {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        City from = dao.getCityByName("Moscow");
-        City to = dao.getCityByName("Delhi");
+        System.out.println("Enter origin: ");
+        City from = dao.getCityByName(scanner.nextLine());
+        System.out.println("Enter Destination: ");
+        City to = dao.getCityByName(scanner.nextLine());
 //        List<City> cities = dao.getCitiesInRange(from, to);
 //        for (City c:cities) {
 //            System.out.println(c.getName());
