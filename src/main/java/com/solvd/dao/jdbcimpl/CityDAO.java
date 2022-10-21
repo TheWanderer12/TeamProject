@@ -3,6 +3,8 @@ package com.solvd.dao.jdbcimpl;
 import com.solvd.dao.connector.ConnectionPool;
 import com.solvd.dao.interfaces.ICityDAO;
 import com.solvd.dao.models.City;
+import com.solvd.dao.service.DistanceCalculator;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CityDAO implements ICityDAO {
     private static final Logger logger = LogManager.getLogger(com.solvd.dao.mybatisimpl.CityDAO.class);
@@ -20,7 +23,8 @@ public class CityDAO implements ICityDAO {
     public City getById(int id) {
         try {
             Connection conn = ConnectionPool.getInstance().retrieve();
-            PreparedStatement statement = conn.prepareStatement("SELECT id, city, lat, lng, country FROM cities WHERE id = ?");
+            PreparedStatement statement = conn
+                    .prepareStatement("SELECT id, city, lat, lng, country FROM cities WHERE id = ?");
             statement.setInt(1, id);
             ResultSet result = statement.executeQuery();
             String output = "";
@@ -51,7 +55,8 @@ public class CityDAO implements ICityDAO {
     public void insert(City city) {
         try {
             Connection conn = ConnectionPool.getInstance().retrieve();
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO cities(city, lat, lng, country) VALUES (?,?,?,?)");
+            PreparedStatement statement = conn
+                    .prepareStatement("INSERT INTO cities(city, lat, lng, country) VALUES (?,?,?,?)");
             statement.setString(1, city.getName());
             statement.setDouble(2, city.getLat());
             statement.setDouble(3, city.getLng());
@@ -79,7 +84,8 @@ public class CityDAO implements ICityDAO {
     public void update(City com) {
         try {
             Connection conn = ConnectionPool.getInstance().retrieve();
-            PreparedStatement statement = conn.prepareStatement("UPDATE cities SET city = ?, lat = ?, lng = ?, country = ?  WHERE id = ?");
+            PreparedStatement statement = conn
+                    .prepareStatement("UPDATE cities SET city = ?, lat = ?, lng = ?, country = ?  WHERE id = ?");
             statement.setString(1, com.getName());
             statement.setDouble(2, com.getLat());
             statement.setDouble(3, com.getLng());
@@ -91,8 +97,6 @@ public class CityDAO implements ICityDAO {
         }
     }
 
-
-
     @Override
     public City getCityByName(String c) {
         try {
@@ -100,17 +104,17 @@ public class CityDAO implements ICityDAO {
             PreparedStatement statement = conn.prepareStatement("SELECT city, lat, lng FROM cities WHERE city = ?");
             statement.setString(1, c);
             ResultSet result = statement.executeQuery();
-//            String output = "";
+            // String output = "";
             City city = new City();
             while (result.next()) {
                 city.setName(result.getString("city"));
                 city.setLat(result.getDouble("lat"));
                 city.setLng(result.getDouble("lng"));
 
-//                output += "lat: " + result.getString("lat")
-//                        + "\nlng: "+ result.getString("lng");
+                // output += "lat: " + result.getString("lat")
+                // + "\nlng: "+ result.getString("lng");
             }
-//            System.out.println(output);
+            // System.out.println(output);
             return city;
         } catch (SQLException e) {
             logger.error(e);
@@ -122,49 +126,40 @@ public class CityDAO implements ICityDAO {
     public List<City> getCitiesInRange(City from, City to) {
         try {
             Connection conn = ConnectionPool.getInstance().retrieve();
-            PreparedStatement statement = conn.prepareStatement("SELECT city, lat, lng FROM cities WHERE (lat > ? AND lat < ?) AND (lng > ? AND lat< ?)");
-            if(from.getLat() <= to.getLat()){
-                statement.setDouble(1, from.getLat());
-                statement.setDouble(2, to.getLat());
-            }else{
-                statement.setDouble(2, from.getLat());
-                statement.setDouble(1, to.getLat());
-            }
-            if(from.getLng() <= to.getLng()){
-                statement.setDouble(3, from.getLng());
-                statement.setDouble(4, to.getLng());
-            }else{
-                statement.setDouble(4, from.getLng());
-                statement.setDouble(3, to.getLng());
-            }
-
+            PreparedStatement statement = conn.prepareStatement("SELECT city, lat, lng FROM cities");
             ResultSet result = statement.executeQuery();
 
-//            String output = "";
+            // String output = "";
             List<City> cities = new ArrayList<>();
-
             while (result.next()) {
                 City city = new City();
                 city.setName(result.getString("city"));
                 city.setLat(result.getDouble("lat"));
                 city.setLng(result.getDouble("lng"));
-//                output += "\nCity: " + result.getString("city")
-//                        +"\nlat: " + result.getString("lat")
-//                        + "\nlng: "+ result.getString("lng");
+                // output += "\nCity: " + result.getString("city")
+                // +"\nlat: " + result.getString("lat")
+                // + "\nlng: "+ result.getString("lng");
                 cities.add(city);
             }
-//            System.out.println(output);
-            return cities;
+
+            double middlePointLat = (double) ((from.getLat() + to.getLat()) / 2);
+            double middlePointLng = (double) ((from.getLng() + to.getLng()) / 2);
+            double radiusOfRangeCircle = (double) (DistanceCalculator.getDistance(from.getLat(), from.getLng(),
+                    to.getLat(), to.getLng()) / 2);
+
+            // System.out.println(output);
+            return cities.stream().filter(c -> DistanceCalculator.getDistance(middlePointLat, middlePointLng,
+                    c.getLat(), c.getLng()) <= radiusOfRangeCircle).collect(Collectors.toList());
         } catch (SQLException e) {
             logger.error(e);
         }
         return new ArrayList<>();
     }
 
-//    public static void main(String[] args) {
-//        CityDAO dao = new CityDAO();
-//        City from = dao.getCityByName("Tokyo");
-//        City to = dao.getCityByName("Shanghai");
-//        dao.getCitiesInRange(from,to);
-//    }
+    // public static void main(String[] args) {
+    // CityDAO dao = new CityDAO();
+    // City from = dao.getCityByName("Tokyo");
+    // City to = dao.getCityByName("Shanghai");
+    // dao.getCitiesInRange(from,to);
+    // }
 }
