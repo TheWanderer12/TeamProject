@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 public class DistanceCalculator {
     public static final CityDAO dao = new CityDAO();
-
+    // nothing
     final static int earthRadiusKm = 6371;
     final static int earthRadiusMile = 3963;
     final static NumberFormat nf = new DecimalFormat("#0.00");
