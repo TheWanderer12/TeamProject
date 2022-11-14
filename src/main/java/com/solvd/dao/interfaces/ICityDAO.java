@@ -4,8 +4,9 @@ import com.solvd.dao.models.City;
 
 import java.util.List;
 
-public interface ICityDAO extends IBaseDAO<City>{
-//    List<City> getProbableRouteCities(String city);
+public interface ICityDAO extends IBaseDAO<City> {
+    // List<City> getProbableRouteCities(String city);
     City getCityByName(String name);
-    List<City> getCitiesInRange(City from, City to);
+
+    List<City> getCitiesInRange(String from, String to);
 }

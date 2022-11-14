@@ -65,11 +65,10 @@ public class CityDAO implements ICityDAO {
         }
     }
 
-
-//    @Override
-//    public List<City> getProbableRouteCities(String city) {
-//        return null;
-//    }
+    // @Override
+    // public List<City> getProbableRouteCities(String city) {
+    // return null;
+    // }
 
     @Override
     public City getCityByName(String name) {
@@ -77,7 +76,7 @@ public class CityDAO implements ICityDAO {
     }
 
     @Override
-    public List<City> getCitiesInRange(City from, City to) {
+    public List<City> getCitiesInRange(String from, String to) {
         return null;
     }
 }

@@ -33,16 +33,19 @@ public class DistanceCalculator {
                                 - Math.toRadians(
                                         originlng)));
 
-        // System.out.println( "distance between " + origin + " and "+ destination + ":
-        // " + result + " Km");
+        // System.out.println("distance between " + originlat + ", " + originlng + " and
+        // " + destinationlat + ", "
+        // + destinationlng + ":" + result + " Km");
         return result;
     }
 
     // checks which city is the closest to the straight line between origin and
     // destination
-    public static City getClosestCityToDiagonal(City from, City to) {
+    public static City getClosestCityToDiagonal(String from, String to) {
         // from -> chosen origin location
         // to -> chosen destination location
+        City origin = dao.getCityByName(from);
+        City destination = dao.getCityByName(to);
         List<City> cities = dao.getCitiesInRange(from, to);
 
         // setting initial Closest city value
@@ -51,10 +54,12 @@ public class DistanceCalculator {
         // checks distances between chosen city(from) and all cities in range
         for (int i = 1; i < cities.size(); i++) {
             // checks if city is closer than initial closest city
-            if (getDistance(from.getLat(), from.getLng(), cities.get(i).getLat(), cities.get(i).getLng())
-                    + getDistance(cities.get(i).getLat(), cities.get(i).getLng(), to.getLat(),
-                            to.getLng()) < getDistance(from.getLat(), from.getLng(), result.getLat(), result.getLng())
-                                    + getDistance(result.getLat(), result.getLng(), to.getLat(), to.getLng())) {
+            if (getDistance(origin.getLat(), origin.getLng(), cities.get(i).getLat(), cities.get(i).getLng())
+                    + getDistance(cities.get(i).getLat(), cities.get(i).getLng(), destination.getLat(),
+                            destination.getLng()) < getDistance(origin.getLat(), origin.getLng(), result.getLat(),
+                                    result.getLng())
+                                    + getDistance(result.getLat(), result.getLng(), destination.getLat(),
+                                            destination.getLng())) {
                 result = cities.get(i);
             }
         }
@@ -62,15 +67,15 @@ public class DistanceCalculator {
     }
 
     // main function: creates path of cities in form of a list
-    public static List<City> getPathCities(City from, City to) {
+    public static List<City> getPathCities(String from, String to) {
         List<City> pathCities = new ArrayList<>();
-        pathCities.add(from);
+        pathCities.add(dao.getCityByName(from));
         while (dao.getCitiesInRange(from, to).size() > 0) {
-            from = getClosestCityToDiagonal(from, to);
-            pathCities.add(from);
+            from = getClosestCityToDiagonal(from, to).getName();
+            pathCities.add(dao.getCityByName(from));
         }
         // if size is 0 its end of path and destination is added to path of cities
-        pathCities.add(to);
+        pathCities.add(dao.getCityByName(to));
         return pathCities;
     }
 
@@ -97,22 +102,25 @@ public class DistanceCalculator {
         Scanner scanner = new Scanner(System.in);
         // User input
         System.out.println("Enter origin: ");
-        City from = dao.getCityByName(scanner.nextLine());
+        String from = scanner.nextLine();
         System.out.println("Enter Destination: ");
-        City to = dao.getCityByName(scanner.nextLine());
+        String to = scanner.nextLine();
+
+        City origin = dao.getCityByName(from);
+        City destination = dao.getCityByName(to);
 
         System.out.println(
-                "Calculating Path From " + from.getName() + " to " + to.getName() + ". it might take few mins...");
+                "Calculating Path From " + from + " to " + to + ". it might take few mins...");
 
-        // System.out.println(getDistance(from.getLat(), from.getLng(), to.getLat(),
-        // to.getLng()));
+        System.out.println(getDistance(origin.getLat(), origin.getLng(), destination.getLat(),
+                destination.getLng()));
 
-        // List<City> pathCities = getPathCities(from, to);
-        // printPathCities(pathCities);
-        // printPathLength(pathCities);
+        List<City> pathCities = getPathCities(from, to);
+        printPathCities(pathCities);
+        printPathLength(pathCities);
 
-        // System.out.println( "\nTokyo lng: " + from.getLng() + " lat: " +
-        // from.getLat()
-        // +"\nshanghai lng: " + to.getLng() + " lat: " + to.getLat());
+        System.out.println("\nTokyo lng: " + origin.getLng() + " lat: " +
+                origin.getLat()
+                + "\nShanghai lng: " + destination.getLng() + " lat: " + destination.getLat());
     }
 }
